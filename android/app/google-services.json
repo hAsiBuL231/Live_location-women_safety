@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "441144425910",
+    "project_id": "track-live-ac5dc",
+    "storage_bucket": "track-live-ac5dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441144425910:android:e1d8e41a2b437193bc1517",
+        "android_client_info": {
+          "package_name": "com.example.flutter_track_live"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441144425910-2hgrdro67d25qmnn03luf27trndoec2j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_track_live",
+            "certificate_hash": "865cc53f53b6f64d643b60bbef5391565bee6a61"
+          }
+        },
+        {
+          "client_id": "441144425910-qllu503vtmlnjkbsuj55kct4psh4kpds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-3x35ohbievcepoc9RCFudSIYgyc8BII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441144425910-qllu503vtmlnjkbsuj55kct4psh4kpds.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "441144425910-fkbaikdshoro4h022fo05dpg2ambj192.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterTrackLive.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
