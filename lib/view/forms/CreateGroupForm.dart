@@ -1,7 +1,10 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../view_models/forms_view_models/create_group_form_view_model.dart';
 
 class CreateGroupForm extends StatefulWidget {
   const CreateGroupForm({super.key});
@@ -11,7 +14,15 @@ class CreateGroupForm extends StatefulWidget {
 }
 
 class _CreateGroupFormState extends State<CreateGroupForm> {
-  TextEditingController projectNameController = TextEditingController();
+  final createGroupFormVM = Get.put(CreateGroupFormViewModel());
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    createGroupFormVM.groupNameController.value.clear();
+    createGroupFormVM.imageUrl.value = '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,22 +111,23 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                                                   Padding(
                                                       padding: EdgeInsets.all(8),
                                                       child: InkWell(
-                                                          onTap: () {},
-                                                          splashColor: Colors.transparent,
-                                                          focusColor: Colors.transparent,
-                                                          hoverColor: Colors.transparent,
-                                                          highlightColor: Colors.transparent,
-                                                          child: ClipRRect(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              child: CachedNetworkImage(
-                                                                fadeInDuration: Duration(milliseconds: 500),
-                                                                fadeOutDuration: Duration(milliseconds: 500),
-                                                                imageUrl: '',
-                                                                width: double.infinity,
-                                                                height: double.infinity,
-                                                                fit: BoxFit.cover,
-                                                                errorWidget: (context, url, error) => Container(),
-                                                              )))),
+                                                        onTap: () => createGroupFormVM.selectPhoto(),
+                                                        splashColor: Colors.transparent,
+                                                        focusColor: Colors.transparent,
+                                                        hoverColor: Colors.transparent,
+                                                        highlightColor: Colors.transparent,
+                                                        child: Obx(() => ClipRRect(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            child: CachedNetworkImage(
+                                                              fadeInDuration: Duration(milliseconds: 500),
+                                                              fadeOutDuration: Duration(milliseconds: 500),
+                                                              imageUrl: createGroupFormVM.imageUrl.value,
+                                                              width: double.infinity,
+                                                              height: double.infinity,
+                                                              fit: BoxFit.cover,
+                                                              errorWidget: (context, url, error) => Container(),
+                                                            ))),
+                                                      )),
                                                 ]),
                                               ))),
                                     ]),
@@ -124,7 +136,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                                         child: TextFormField(
                                           onTap: () {},
-                                          controller: projectNameController,
+                                          controller: createGroupFormVM.groupNameController.value,
                                           //focusNode: _model.projectNameFocusNode,
                                           //autofocus: true,
                                           obscureText: false,
@@ -132,21 +144,17 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                                             hintText: 'Group Name',
                                             hintStyle: TextStyle(fontSize: 14, fontFamily: GoogleFonts.manrope.toString(), color: Colors.black),
                                             enabledBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black, width: 2),
-                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
-                                            ),
+                                                borderSide: BorderSide(color: Colors.black, width: 2),
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0))),
                                             focusedBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black, width: 2),
-                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
-                                            ),
+                                                borderSide: BorderSide(color: Colors.black, width: 2),
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0))),
                                             errorBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black, width: 2),
-                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
-                                            ),
+                                                borderSide: BorderSide(color: Colors.black, width: 2),
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0))),
                                             focusedErrorBorder: const UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.black, width: 2),
-                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0)),
-                                            ),
+                                                borderSide: BorderSide(color: Colors.black, width: 2),
+                                                borderRadius: BorderRadius.only(topLeft: Radius.circular(4.0), topRight: Radius.circular(4.0))),
                                             contentPadding: const EdgeInsetsDirectional.fromSTEB(6, 6, 0, 6),
                                           ),
                                           style: TextStyle(fontSize: 16, fontFamily: GoogleFonts.manrope.toString(), color: Colors.black),
@@ -159,7 +167,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                                       child: Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [
                                         Padding(
                                           padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 4, 0),
-                                          child: FloatingActionButton.extended(onPressed: () {}, label: const Text("Create Group")),
+                                          child: FloatingActionButton.extended(onPressed: () => createGroupFormVM.submitForm(context), label: const Text("Create Group")),
                                         ),
                                       ]),
                                     ),

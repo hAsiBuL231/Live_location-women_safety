@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_track_live/.utils/utils.dart';
+import 'package:flutter_track_live/view/Authentication/signup_view/SignUpPageView.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter_track_live/view_models/login_view_model/LoginViewModel.dart';
-import '../../.utils/Functions.dart';
+
+import '../../../.utils/Functions.dart';
+import '../forget_password_view/ForgetPasswordPage.dart';
 
 class LoginPageView extends StatefulWidget {
   const LoginPageView({super.key});
@@ -35,9 +38,8 @@ class _LoginPageViewState extends State<LoginPageView> {
             child: Column(children: [
               const Text("Welcome Back!\nLogin", textAlign: TextAlign.center, style: TextStyle(fontSize: 34, color: Colors.white, fontFamily: "Raleway", height: 1.2)),
               TextButton(
-                  //onPressed: () => nextPage(const SignUpPage(), context),
+                  onPressed: () => nextPage(const SignUpPageView(), context),
                   style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blue)),
-                  onPressed: () {},
                   child: const Text("New User? Register", style: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'OpenSans'))),
               const SizedBox(height: 40),
               Form(
@@ -65,7 +67,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                           filled: true,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)))),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  Obx(() => TextFormField(
                       controller: loginVM.passwordController.value,
                       focusNode: loginVM.passwordFocusNode.value,
                       validator: (input) {
@@ -74,7 +76,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                         }
                         return null;
                       },
-                      obscureText: true,
+                      obscureText: !loginVM.passwordVisibility.value,
                       //onChanged: (value) => _password = value,
                       onFieldSubmitted: (value) {
                         if (_formKey.currentState!.validate()) {
@@ -82,46 +84,43 @@ class _LoginPageViewState extends State<LoginPageView> {
                         }
                       },
                       decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.vpn_key, color: Colors.white),
                           hintText: 'Password',
                           labelText: 'Password',
                           fillColor: Colors.white70,
                           filled: true,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)))),
+                          prefixIcon: const Icon(Icons.vpn_key, color: Colors.white),
+                          suffixIcon: InkWell(
+                              onTap: () => setState(() => loginVM.passwordVisibility.value = !loginVM.passwordVisibility.value),
+                              focusNode: FocusNode(skipTraversal: true),
+                              child: Icon(loginVM.passwordVisibility.value ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  color: const Color(0x80FFFFFF), size: 22)),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))))),
                 ]),
               ),
               TextButton(
-                  //onPressed: () => nextPage(const ForgetPasswordPage(), context),
+                  onPressed: () => nextPage(const ForgetPasswordPage(), context),
                   style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(Colors.transparent),
                       textStyle: MaterialStatePropertyAll(TextStyle(decoration: TextDecoration.underline))),
-                  onPressed: () {},
                   child: const Text("Forgot Password?", style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'OpenSans'))),
               const SizedBox(height: 40),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 const Text("Sign In", style: TextStyle(color: Colors.white, fontSize: 32, fontFamily: "Raleway")),
-                if (loginVM.loading.isFalse)
-                  FloatingActionButton(
-                      child: const Icon(Icons.arrow_forward),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) loginVM.loginApi(context);
-                      })
-                else
-                  const CircularProgressIndicator(),
-                /*Obx(() {
+                Obx(() {
                   if (loginVM.loading.isFalse) {
                     return FloatingActionButton(
                         child: const Icon(Icons.arrow_forward),
                         onPressed: () async {
-                          if (_formKey.currentState!.validate()) loginVM.loginApi();
+                          if (_formKey.currentState!.validate()) loginVM.loginApi(context);
                         });
                   } else {
                     return const CircularProgressIndicator();
                   }
-                })*/
+                }),
               ]),
               const SizedBox(height: 20),
               FloatingActionButton.extended(
+                  heroTag: 'googleLogin',
                   onPressed: () async {
                     loginVM.googleLoginApi(context);
                   },

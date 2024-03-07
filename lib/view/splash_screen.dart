@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../view_models/home_page_model/HomePageModel.dart';
+import 'Authentication/login_view/LoginPageView.dart';
 import 'forms/UserForm.dart';
 import 'home_page_view/HomePage.dart';
-import 'login_view/LoginPageView.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -25,10 +25,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    final homePageVM = Get.put(HomePageModel());
 
     String? userName = FirebaseAuth.instance.currentUser?.displayName;
-    if (userName != null) {
+    if (userName != null || userName != '') {
+      final homePageVM = Get.put(HomePageModel());
+
       homePageVM.loadData(context).then((value) {
         _startTimer();
       });
@@ -59,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
               //Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPageView()));
             } else {
               print('User is logged in!');
-              if (user.displayName != null) {
+              if (user.displayName != null || user.displayName != '') {
                 showToast('Welcome Back, ${user.displayName}!');
                 newPage(const HomePageWidget(), context);
                 //Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageWidget()));

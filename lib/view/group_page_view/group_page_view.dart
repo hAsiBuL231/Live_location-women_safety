@@ -10,14 +10,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../.data/network/network_api_services.dart';
 import '../../.resources/app_url/AppUrl.dart';
 import '../../.resources/colours/app_colours.dart';
+import '../../models/group_models.dart';
 import '../../models/user_models.dart';
 import '../forms/AddMemberForm.dart';
 import '../forms/CreateGroupForm.dart';
 import '../map_view/MapPage.dart';
 
 class GroupViewWidget extends StatefulWidget {
-  final List<String> idList;
-  const GroupViewWidget({super.key, required this.idList});
+  final Group passedGroup;
+  const GroupViewWidget({super.key, required this.passedGroup});
 
   @override
   State<GroupViewWidget> createState() => _GroupViewWidgetState();
@@ -166,7 +167,7 @@ class _GroupViewWidgetState extends State<GroupViewWidget> {
                 padding: const EdgeInsets.all(10),
                 child: FloatingActionButton.extended(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  onPressed: () => nextPage(const AddMemberForm(), context),
+                  onPressed: () => nextPage(AddMemberForm(passedGroup: widget.passedGroup), context),
                   elevation: 5,
                   backgroundColor: AppColours.tertiary,
                   label: AutoSizeText("Add Member",
@@ -179,25 +180,32 @@ class _GroupViewWidgetState extends State<GroupViewWidget> {
           future: NetworkApiServices().getApi(AppUrl.userCollectionUrl),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+            if (widget.passedGroup.idList != null && snapshot.data['documents'] != null) {
+              /// /////////////////////////////////// Finding the user data   //////////////////////////////
+              var response = snapshot.data['documents'];
+              var users = response.map((doc) => Users.fromJson(doc));
 
-            /// /////////////////////////////////// Finding the user data   //////////////////////////////
-            var response = snapshot.data['documents'];
-            var users = response.map((doc) => Users.fromJson(doc));
+              /// /////////////////////////////////// Finding the user data   //////////////////////////////
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.passedGroup.idList?.length,
+                itemBuilder: (context, index) {
+                  var matchedUsers = users.where((users) => users.securityCode == widget.passedGroup.idList![index]).toList();
+                  return customListTile(
+                      title: matchedUsers[0].name,
+                      imageUrl: matchedUsers[0].imageUrl,
+                      subTitle: 'See live location..',
+                      onPress: () => nextPage(MapPage(securityCode: matchedUsers[0].securityCode), context));
+                  //return customListTile(title: widget.idList[index]);
+                },
+              );
+            }
 
-            /// /////////////////////////////////// Finding the user data   //////////////////////////////
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: widget.idList.length,
-              itemBuilder: (context, index) {
-                var matchedUsers = users.where((users) => users.securityCode == widget.idList[index]).toList();
-                return customListTile(
-                    title: matchedUsers[0].name,
-                    imageUrl: matchedUsers[0].imageUrl,
-                    subTitle: 'See live location..',
-                    onPress: () => nextPage(MapPage(securityCode: matchedUsers[0].securityCode), context));
-                //return customListTile(title: widget.idList[index]);
-              },
-            );
+            return Center(
+                child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("No member", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: GoogleFonts.aboreto.toString())),
+            ));
           },
         ),
         /*ListView.builder(

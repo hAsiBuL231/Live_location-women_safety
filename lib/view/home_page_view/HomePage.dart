@@ -117,8 +117,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
                 /// ///////////////////////////    Next Button   ///////////////////////////
 
-                ElevatedButton(onPressed: () => nextPage(const UserProfile(), context), child: const Text("Next Page")),
-                const SizedBox(height: 20),
+                /*ElevatedButton(onPressed: () => nextPage(const UserProfile(), context), child: const Text("Next Page")),
+                const SizedBox(height: 20),*/
 
                 /// ///////////////////////////    User Data   ///////////////////////////
 

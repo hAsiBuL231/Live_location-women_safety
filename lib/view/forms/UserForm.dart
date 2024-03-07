@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_track_live/.utils/Functions.dart';
 import 'package:flutter_track_live/view/home_page_view/HomePage.dart';
-import 'package:images_picker/images_picker.dart';
+import 'package:get/get.dart';
+import '../../components/GetImage.dart';
+import '../../view_models/forms_view_models/UserFormViewModel.dart';
 
 class UserForm extends StatefulWidget {
   @override
@@ -17,90 +21,13 @@ class _UserFormState extends State<UserForm> {
   final userEmail = FirebaseAuth.instance.currentUser?.email;
   String? userImage = FirebaseAuth.instance.currentUser?.photoURL;
 
-  String _message = 'Personal information saved successfully!';
-  String error = '';
-
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _batchController = TextEditingController();
+  final userFormVM = Get.put(UserFormViewModel());
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
-    _batchController.dispose();
+    userFormVM.nameController.value.dispose(); // userFormVM.nameController.value
+    userFormVM.phoneController.value.dispose(); // userFormVM.phoneController.value
     super.dispose();
-  }
-
-  Future<void> _submitForm() async {
-    //if (formKey5.currentState!.validate()) {
-      try {
-        CollectionReference users = FirebaseFirestore.instance.collection('users');
-        DateTime now = DateTime.now();
-        DateTime date = DateTime(now.year, now.month, now.day);
-        // Add the user data to Firestore
-        await users
-            .doc('$userEmail')
-            .set({
-              'name': _nameController.text,
-              'email': userEmail.toString(),
-              'phone': _phoneController.text,
-              'batch': _batchController.text,
-              'joined': date,
-            })
-            .then((value) => SnackBar(content: Text('Data added')))
-            .catchError((error) => SnackBar(content: Text('Error: $error')));
-
-        FirebaseAuth.instance.currentUser!.updateDisplayName(_nameController.text);
-
-        // Clear the form fields
-        _nameController.clear();
-        _phoneController.clear();
-        _batchController.clear();
-      } on FirebaseException catch (e) {
-        setState(() {
-          error = e.message.toString();
-        });
-      }
-
-      // Show a success dialog
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(title: Text('Success'), content: Text('$_message'), actions: [
-                TextButton(
-                    onPressed: () {
-                      //Navigator.of(context).pop();
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => HomePageWidget()));
-                    },
-                    child: Text('OK'))
-              ]));
-    //}
-  }
-
-  Future<void> _selectPhoto() async {
-    List<Media>? pickedFile = await ImagesPicker.pick(count: 1, pickType: PickType.image);
-    var image = pickedFile?.first;
-    //final pickedFile =
-    //    await ImagePicker().pickImage(source: ImageSource.gallery);
-    //XFile image = await ImagePickerAndroid.pickImage(source: Images);
-
-    if (pickedFile != null) {
-      try {
-        Reference ref = FirebaseStorage.instance.ref().child('profile.jpg');
-        await ref.putString(image!.path);
-        ref.getDownloadURL().then((value) {
-          print(value);
-          setState(() {
-            FirebaseAuth.instance.currentUser?.updatePhotoURL(value);
-            userImage = FirebaseAuth.instance.currentUser?.photoURL;
-          });
-        });
-      } catch (e) {
-        setState(() {
-          error = e.toString();
-        });
-      }
-    }
   }
 
   @override
@@ -115,9 +42,25 @@ class _UserFormState extends State<UserForm> {
             children: [
               SizedBox(height: 16.0),
               CircleAvatar(radius: 80, backgroundImage: NetworkImage('$userImage')),
-              TextButton(onPressed: () => _selectPhoto(), child: Text('Select Image')),
-              SizedBox(height: 10.0),
-              Text('$error'),
+              TextButton(onPressed: () => nextPage(const GetImage(), context), child: Text('Select Image')),
+
+              //TextButton(onPressed: () => userFormVM.selectPhoto(), child: Text('Select Image')),
+              // SizedBox(height: 10.0),
+              // Container(
+              //     width: 90,
+              //     height: 90,
+              //     decoration: const BoxDecoration(shape: BoxShape.circle),
+              //     child: Container(
+              //       width: 80,
+              //       height: 80,
+              //       clipBehavior: Clip.antiAlias,
+              //       decoration: const BoxDecoration(shape: BoxShape.circle),
+              //       child: CircleAvatar(backgroundColor: Colors.deepPurpleAccent, child: CachedNetworkImage(imageUrl: '$userImage', fit: BoxFit.cover)),
+              //     )),
+              // const SizedBox(height: 20),
+              // FloatingActionButton.extended(onPressed: () => nextPage(const GetImage(), context), label: const Text("Change Photo"), heroTag: 'tag1'),
+              const SizedBox(height: 30),
+
               TextFormField(
                   validator: (value) {
                     if (value == '')
@@ -125,7 +68,7 @@ class _UserFormState extends State<UserForm> {
                     else
                       return null;
                   },
-                  controller: _nameController,
+                  controller: userFormVM.nameController.value,
                   decoration: InputDecoration(prefixIcon: Icon(Icons.account_circle, color: Colors.blue), labelText: 'Name', hintText: '$userName')),
               SizedBox(height: 16.0),
               TextFormField(
@@ -135,11 +78,11 @@ class _UserFormState extends State<UserForm> {
                   else
                     return null;
                 },
-                controller: _phoneController,
+                controller: userFormVM.phoneController.value,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(labelText: 'Phone', prefixIcon: Icon(Icons.phone, color: Colors.blue)),
               ),
-              SizedBox(height: 16.0),
+              /*SizedBox(height: 16.0),
               TextFormField(
                 validator: (value) {
                   if (value == '')
@@ -150,11 +93,11 @@ class _UserFormState extends State<UserForm> {
                 controller: _batchController,
                 keyboardType: TextInputType.streetAddress,
                 decoration: InputDecoration(labelText: 'Your Batch', prefixIcon: Icon(Icons.location_on, color: Colors.blue)),
-              ),
+              ),*/
               SizedBox(height: 32.0),
               ElevatedButton(
-                child: Text('Submit', style: TextStyle(fontSize: 28, color: Colors.white)),
-                onPressed: _submitForm,
+                child: Text('Submit', style: TextStyle(fontSize: 28, color: Colors.black)),
+                onPressed: () => userFormVM.submitForm(context),
               ),
             ],
           ),

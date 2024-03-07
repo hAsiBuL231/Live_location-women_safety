@@ -4,11 +4,11 @@ class Group {
   String? groupId;
   String? name;
   String? image;
-  List<String>? idList;
+  List<String> idList = [];
   String? createTime;
   String? updateTime;
 
-  Group({this.groupId, this.name, this.image, this.idList, this.createTime, this.updateTime});
+  Group({this.groupId, this.name, this.image, required this.idList, this.createTime, this.updateTime});
 
   Group.fromJson(Map<String, dynamic> json) {
     try {

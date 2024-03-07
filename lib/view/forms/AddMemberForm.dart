@@ -2,18 +2,27 @@
 
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_track_live/view/group_page_view/group_page_view.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import '../../.data/user_data_SharedPreferences/app_user_data.dart';
+import '../../.utils/Functions.dart';
+import '../../models/group_models.dart';
 
 class AddMemberForm extends StatefulWidget {
-  const AddMemberForm({super.key});
+  final Group passedGroup;
+  const AddMemberForm({super.key, required this.passedGroup});
 
   @override
   State<AddMemberForm> createState() => _AddMemberFormState();
 }
 
 class _AddMemberFormState extends State<AddMemberForm> {
-  TextEditingController projectNameController = TextEditingController();
+  TextEditingController securityCodeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +86,7 @@ class _AddMemberFormState extends State<AddMemberForm> {
                                         padding: const EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                                         child: TextFormField(
                                           onTap: () {},
-                                          controller: projectNameController,
+                                          controller: securityCodeController,
                                           //focusNode: _model.projectNameFocusNode,
                                           //autofocus: true,
                                           obscureText: false,
@@ -112,7 +121,31 @@ class _AddMemberFormState extends State<AddMemberForm> {
                                       child: Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.end, children: [
                                         Padding(
                                           padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 4, 0),
-                                          child: FloatingActionButton.extended(onPressed: () {}, label: const Text("Add Member")),
+                                          child: FloatingActionButton.extended(
+                                              onPressed: () async {
+                                                widget.passedGroup.idList.add(securityCodeController.text);
+                                                try {
+                                                  final provider = Provider.of<UserDataProvider>(context, listen: false);
+
+                                                  CollectionReference users = FirebaseFirestore.instance.collection('User');
+                                                  // Add the user data to Firestore
+                                                  await users
+                                                      .doc(provider.userData!.securityCode)
+                                                      .collection('group')
+                                                      .doc(widget.passedGroup.groupId)
+                                                      .update({'id_list': widget.passedGroup.idList})
+                                                      .then((value) => const SnackBar(content: Text('Data added')))
+                                                      .catchError((error) => SnackBar(content: Text('Error: $error')));
+
+                                                  // Clear the form fields
+                                                  securityCodeController.clear();
+                                                } on FirebaseException catch (e) {
+                                                  showToast(e.toString(), error: true);
+                                                }
+                                                Navigator.pop(context);
+                                                //nextPage(GroupViewWidget(passedGroup: widget.passedGroup), context);
+                                              },
+                                              label: const Text("Add Member")),
                                         ),
                                       ]),
                                     ),

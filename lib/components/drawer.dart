@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_track_live/view/home_page_view/HomePage.dart';
-import 'package:flutter_track_live/view/login_view/LoginPageView.dart';
 
 import '../.utils/Functions.dart';
+import '../view/Authentication/login_view/LoginPageView.dart';
 import '../view/user_view/user_profile.dart';
 
 class DrawerWidget extends StatelessWidget {

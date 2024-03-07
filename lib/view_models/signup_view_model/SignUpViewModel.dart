@@ -1,3 +1,5 @@
+//SignUpViewModel
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_track_live/repository/login_repository/LoginRepository.dart';
@@ -8,35 +10,38 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../.utils/Functions.dart';
 
-class LoginViewModel extends GetxController {
+class SignUpViewModel extends GetxController {
   final _api = LoginRepository();
 
   final emailController = TextEditingController().obs;
   final passwordController = TextEditingController().obs;
+  final confirmPasswordController = TextEditingController().obs;
 
   final emailFocusNode = FocusNode().obs;
   final passwordFocusNode = FocusNode().obs;
+  final confirmPasswordFocusNode = FocusNode().obs;
 
-  RxBool passwordVisibility = false.obs;
+  RxBool passwordVisibility1 = false.obs;
+  RxBool passwordVisibility2 = false.obs;
 
   RxBool loading = false.obs;
 
-  Future<void> loginApi(context) async {
+  Future<void> signUpApi(context) async {
     loading.value = true;
     Map data = {
       'email': emailController.value.text,
       'password': passwordController.value.text,
     };
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: data['email'], password: data['password']);
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: data['email'], password: data['password']);
     } on FirebaseAuthException catch (e) {
-      showToast(e.message!);
+      showToast(e.message!, error: true);
     }
 
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       showToast('User is Signed in!');
-      Get.delete<LoginViewModel>();
+      Get.delete<SignUpViewModel>();
       //Get.to(const HomePageWidget());
       nextPage(const SplashScreen(), context);
     }
@@ -52,21 +57,4 @@ class LoginViewModel extends GetxController {
     });*/
   }
 
-  googleLoginApi(context) async {
-    try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      showToast(e.toString());
-    }
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      print('User is Signed in!');
-      //Get.to(const HomePageWidget());
-      nextPage(const SplashScreen(), context);
-    }
-  }
 }

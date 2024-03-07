@@ -13,7 +13,7 @@ import '../../../.resources/colours/app_colours.dart';
 import '../../../models/group_models.dart';
 import '../../forms/CreateGroupForm.dart';
 import '../../../components/customForm.dart';
-import '../../group_view/group_view.dart';
+import '../../group_page_view/group_page_view.dart';
 
 /// ///////////////////////////    Create new Group   ///////////////////////////
 Widget groupListWidget(BuildContext context) {
@@ -45,6 +45,14 @@ Widget groupListWidget(BuildContext context) {
           var groups = snapshot.data['documents'];
           print(" \n \n \n groupListWidget Snapshot:          ${snapshot.data.toString()}");
 
+          if (groups == null) {
+            return Center(
+                child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("No group", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: GoogleFonts.aboreto.toString())),
+            ));
+          }
+
           return Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
             child: ListView.builder(
@@ -60,10 +68,10 @@ Widget groupListWidget(BuildContext context) {
                 String? g_ID = group.groupId;
                 String? g_name = group.name.toString();
                 String? g_image = group.image.toString();
-                String? g_idListLenght = group.idList?.length.toString();
+                String? g_idListLenght = group.idList.length.toString();
 
                 return customListTile(
-                    title: g_name, subTitle: 'Members: $g_idListLenght', imageUrl: g_image, onPress: () => nextPage(GroupViewWidget(idList: group.idList!), context));
+                    title: g_name, subTitle: 'Members: $g_idListLenght', imageUrl: g_image, onPress: () => nextPage(GroupViewWidget(passedGroup: group), context));
               },
             ),
           );
